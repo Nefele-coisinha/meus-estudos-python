@@ -12,7 +12,10 @@ elif operacao == "-":
 elif operacao == "*":
     resultado = num1 * num2
 elif operacao == "/":
-    resultado = num1 / num2
+    if num2 == 0:
+        resultado = "erro: divisão por zero"
+    else:
+        resultado = num1 / num2
 else:
     resultado = "operação invalida!"
 

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafios de Lógica • Prova</title>
+
+    <style>
+        :root{
+            --bg1:#0ea5e9;
+            --bg2:#22c55e;
+            --text:#0f172a;
+            --muted:#475569;
+            --good:#16a34a;
+            --bad:#dc2626;
+            --shadow: 0 10px 30px rgba(2,6,23,.12);
+            --radius:16px;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: radial-gradient(1200px 500px at 20% 0%, rgba(14,165,233,.25), transparent 60%),
+                        radial-gradient(900px 400px at 90% 10%, rgba(34,197,94,.20), transparent 55%),
+                        linear-gradient(135deg, #f1f5f9, #e8f5ff);
+            color: var(--text);
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .wrap{ max-width: 980px; margin: 0 auto; }
+
+        header{
+            display:flex;
+            gap:16px;
+            align-items:flex-start;
+            justify-content:space-between;
+            margin-bottom: 18px;
+            flex-wrap:wrap;
+        }
+
+        .title{ display:flex; flex-direction:column; gap:6px; }
+        h1{ margin:0; font-size: 28px; letter-spacing:-.02em; }
+        .subtitle{ margin:0; color: var(--muted); font-weight: 500; }
+
+        .progress{
+            min-width: 260px;
+            background: rgba(255,255,255,.65);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(15,23,42,.08);
+            border-radius: 999px;
+            padding: 10px 14px;
+            box-shadow: 0 8px 18px rgba(2,6,23,.06);
+        }
+
+        .progressTop{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .bar{ width:100%; height: 10px; background: rgba(2,6,23,.08); border-radius: 999px; overflow:hidden; }
+        .bar > div{ height: 100%; width: 0%; background: linear-gradient(90deg, var(--bg1), var(--bg2)); border-radius: 999px; transition: width .35s ease; }
+
+        .grid{ display:grid; grid-template-columns: 1fr; gap: 14px; }
+        @media (min-width: 820px){ .grid{ grid-template-columns: 1fr 1fr; } }
+
+        .challenge{
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(15,23,42,.10);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow:hidden;
+        }
+
+        .challenge::before{
+            content:"";
+            position:absolute;
+            inset:-60px -60px auto auto;
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle at 30% 30%, rgba(14,165,233,.35), transparent 60%),
+                        radial-gradient(circle at 70% 70%, rgba(34,197,94,.30), transparent 58%);
+            transform: rotate(12deg);
+            pointer-events:none;
+        }
+
+        .chTop{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 10px; position:relative; }
+
+        .badge{ display:inline-flex; align-items:center; gap:8px; font-weight: 800; letter-spacing: -.01em; }
+        .badge i{ display:inline-flex; width: 28px; height: 28px; border-radius: 10px; align-items:center; justify-content:center; background: rgba(14,165,233,.12); border:1px solid rgba(14,165,233,.22); }
+        .statusPill{ font-size: 12px; color: var(--muted); background: rgba(2,6,23,.04); border: 1px solid rgba(2,6,23,.08); padding: 6px 10px; border-radius: 999px; font-weight: 700; }
+
+        code{
+            display:block;
+            background: #0b1220;
+            color: #e5e7eb;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 10px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.45;
+            border: 1px solid rgba(255,255,255,.08);
+            white-space: pre-wrap;
+        }
+
+        .inputs{ display:flex; align-items:center; flex-wrap:wrap; gap: 10px; margin-top: 10px; }
+        input{ width: 88px; padding: 10px; border: 1px solid rgba(15,23,42,.18); border-radius: 12px; background: rgba(255,255,255,.9); font-weight: 800; outline: none; transition: box-shadow .15s ease, border-color .15s ease; }
+        input:focus{ border-color: rgba(14,165,233,.65); box-shadow: 0 0 0 4px rgba(14,165,233,.18); }
+
+        .rowActions{ display:flex; align-items:center; justify-content:space-between; gap: 12px; margin-top: 12px; flex-wrap:wrap; }
+
+        button{
+            padding: 10px 14px;
+            background: linear-gradient(90deg, rgba(14,165,233,1), rgba(34,197,94,1));
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 12px;
+            font-weight: 900;
+            letter-spacing: -.01em;
+            box-shadow: 0 10px 20px rgba(14,165,233,.20);
+            transition: transform .08s ease, filter .15s ease;
+        }
+        button:hover{ filter: brightness(1.03); }
+        button:active{ transform: translateY(1px); }
+        button:disabled{ cursor:not-allowed; opacity:.65; box-shadow:none; }
+
+        .feedback{ font-weight: 900; min-height: 22px; display:flex; align-items:center; }
+        .feedback.good{ color: var(--good); }
+        .feedback.bad{ color: var(--bad); }
+
+        .hint{ color: var(--muted); font-size: 12px; font-weight: 700; }
+    </style>
+</head>
+
+<body>
+<div class="wrap">
+
+<header>
+    <div class="title">
+        <h1>Desafios de Lógica</h1>
+        <p class="subtitle">Complete as lacunas e teste seu raciocínio em JavaScript.</p>
+    </div>
+
+    <div class="progress" aria-label="Progresso">
+        <div class="progressTop">
+            <span>Progresso</span>
+            <span id="progressText">0/5 concluídos</span>
+        </div>
+        <div class="bar"><div id="barFill"></div></div>
+    </div>
+</header>
+
+<div class="grid">
+
+    <div class="challenge" data-q="1">
+        <div class="chTop">
+            <div class="badge"><i>1</i> Desafio 1</div>
+            <div class="statusPill" id="pill1">Em andamento</div>
+        </div>
+        <div class="hint">Use a inicialização e o limite do <b>for</b>.</div>
+        <code>
+for (let i = ___; i <= ___; i++) {
+    console.log(i);
+}
+        </code>
+        <div class="inputs">
+            <input id="q1" placeholder="início" maxlength="3">
+            <input id="q2" placeholder="final" maxlength="3">
+        </div>
+        <div class="rowActions">
+            <button onclick="check(1)" id="btn1">Verificar</button>
+            <div id="fb1" class="feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <div class="challenge" data-q="2">
+        <div class="chTop">
+            <div class="badge"><i>2</i> Desafio 2</div>
+            <div class="statusPill" id="pill2">Em andamento</div>
+        </div>
+        <div class="hint">Qual operador completa a soma?</div>
+        <code>
+let soma = a ___ b;
+        </code>
+        <div class="inputs">
+            <input id="q3" placeholder="operador" maxlength="2">
+        </div>
+        <div class="rowActions">
+            <button onclick="check(2)" id="btn2">Verificar</button>
+            <div id="fb2" class="feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <div class="challenge" data-q="3">
+        <div class="chTop">
+            <div class="badge"><i>3</i> Desafio 3</div>
+            <div class="statusPill" id="pill3">Em andamento</div>
+        </div>
+        <div class="hint">Complete a condição.</div>
+        <code>
+if (numero ___ 10)
+        </code>
+        <div class="inputs">
+            <input id="q4" placeholder="condição" maxlength="2">
+        </div>
+        <div class="rowActions">
+            <button onclick="check(3)" id="btn3">Verificar</button>
+            <div id="fb3" class="feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <div class="challenge" data-q="4">
+        <div class="chTop">
+            <div class="badge"><i>4</i> Desafio 4</div>
+            <div class="statusPill" id="pill4">Em andamento</div>
+        </div>
+        <div class="hint">Até onde vai o loop?</div>
+        <code>
+for (let i = 1; i <= ___; i++)
+        </code>
+        <div class="inputs">
+            <input id="q5" placeholder="limite" maxlength="3">
+        </div>
+        <div class="rowActions">
+            <button onclick="check(4)" id="btn4">Verificar</button>
+            <div id="fb4" class="feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <div class="challenge" data-q="5" style="grid-column: 1 / -1;">
+        <div class="chTop">
+            <div class="badge"><i>5</i> Desafio 5</div>
+            <div class="statusPill" id="pill5">Em andamento</div>
+        </div>
+        <div class="hint">Complete com o operador de subtração.</div>
+        <code>
+let diferenca = a ___ b;
+        </code>
+        <div class="inputs">
+            <input id="q6" placeholder="operador" maxlength="2">
+        </div>
+        <div class="rowActions">
+            <button onclick="check(5)" id="btn5">Verificar</button>
+            <div id="fb5" class="feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+</div>
+
+</div>
+
+<script>
+(function(){
+    const total = 5;
+    const state = new Map();
+
+    function normalize(v){
+        return (v ?? "").toString().trim();
+    }
+
+    window.check = function(id){
+        let correct = true;
+        let msg = "";
+
+        const q1 = normalize(document.getElementById("q1").value);
+        const q2 = normalize(document.getElementById("q2").value);
+        const q3 = normalize(document.getElementById("q3").value);
+        const q4 = normalize(document.getElementById("q4").value);
+        const q5 = normalize(document.getElementById("q5").value);
+        const q6 = normalize(document.getElementById("q6").value);
+
+        if (id === 1) {
+            if (q1 !== "1" || q2 !== "5") correct = false;
+            msg = correct ? "✅ Certo!" : "❌ Tente novamente.";
+        } else if (id === 2) {
+            if (q3 !== "+") correct = false;
+            msg = correct ? "✅ Certo!" : "❌ Tente novamente.";
+        } else if (id === 3) {
+            if (q4 !== ">") correct = false;
+            msg = correct ? "✅ Certo!" : "❌ Tente novamente.";
+        } else if (id === 4) {
+            if (q5 !== "10") correct = false;
+            msg = correct ? "✅ Certo!" : "❌ Tente novamente.";
+        } else if (id === 5) {
+            if (q6 !== "-") correct = false;
+            msg = correct ? "✅ Certo!" : "❌ Tente novamente.";
+        }
+
+        const fb = document.getElementById("fb" + id);
+        const pill = document.getElementById("pill" + id);
+        const btn = document.getElementById("btn" + id);
+
+        fb.innerHTML = `<span class="msg">${msg}</span>`;
+        fb.classList.remove("good","bad");
+        fb.classList.add(correct ? "good" : "bad");
+
+        if (correct) {
+            state.set(id, true);
+            pill.textContent = "Concluído";
+            btn.disabled = true;
+        } else {
+            pill.textContent = "Tente novamente";
+        }
+
+        updateProgress();
+    };
+
+    function updateProgress(){
+        let done = 0;
+        for (let id = 1; id <= total; id++) {
+            if (state.get(id)) done++;
+        }
+        const pct = Math.round((done/total)*100);
+        document.getElementById("barFill").style.width = pct + "%";
+        document.getElementById("progressText").textContent = `${done}/${total} concluídos`;
+    }
+})();
+</script>
+
+</body>
+</html>
+

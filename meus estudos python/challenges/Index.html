@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Desafios de Lógica</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .challenge {
+            background: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4CAF50;
+            border-radius: 5px;
+        }
+
+        input {
+            width: 60px;
+            padding: 5px;
+            margin: 5px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        code {
+            display: block;
+            background: #eee;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Desafios de Lógica</h1>
+
+<div class="challenge">
+    <h3>Desafio 1</h3>
+
+    <code>
+for (let i = ___; i <= ___; i++) {
+    console.log(i);
+}
+    </code>
+
+    <input id="q1">
+    <input id="q2">
+
+    <br>
+    <button onclick="check(1)">Verificar</button>
+    <div id="fb1" class="feedback"></div>
+</div>
+
+<div class="challenge">
+    <h3>Desafio 2</h3>
+
+    <code>
+let soma = a ___ b;
+    </code>
+
+    <input id="q3">
+
+    <br>
+    <button onclick="check(2)">Verificar</button>
+    <div id="fb2" class="feedback"></div>
+</div>
+
+<div class="challenge">
+    <h3>Desafio 3</h3>
+
+    <code>
+if (numero ___ 10)
+    </code>
+
+    <input id="q4">
+
+    <br>
+    <button onclick="check(3)">Verificar</button>
+    <div id="fb3" class="feedback"></div>
+</div>
+
+<div class="challenge">
+    <h3>Desafio 4</h3>
+
+    <code>
+for (let i = 1; i <= ___; i++)
+    </code>
+
+    <input id="q5">
+
+    <br>
+    <button onclick="check(4)">Verificar</button>
+    <div id="fb4" class="feedback"></div>
+</div>
+
+<script>
+function check(id) {
+
+    let correct = true;
+    let msg = "";
+
+    // 🔥 PEGA OS VALORES DO JEITO CERTO
+    const q1 = document.getElementById("q1").value;
+    const q2 = document.getElementById("q2").value;
+    const q3 = document.getElementById("q3").value;
+    const q4 = document.getElementById("q4").value;
+    const q5 = document.getElementById("q5").value;
+
+    if (id === 1) {
+        if (q1 != "1" || q2 != "5") correct = false;
+        msg = correct ? "✅ Certo!" : "❌ Tenta de novo";
+    }
+
+    if (id === 2) {
+        if (q3 != "+") correct = false;
+        msg = correct ? "✅ Certo!" : "❌ É soma";
+    }
+
+    if (id === 3) {
+        if (q4 != ">") correct = false;
+        msg = correct ? "✅ Certo!" : "❌ É maior que";
+    }
+
+    if (id === 4) {
+        if (q5 != "10") correct = false;
+        msg = correct ? "✅ Certo!" : "❌ Vai até 10";
+    }
+
+    let fb = document.getElementById("fb" + id);
+    fb.innerText = msg;
+    fb.style.color = correct ? "green" : "red";
+}
+</script>
+
+</body>
+</html>

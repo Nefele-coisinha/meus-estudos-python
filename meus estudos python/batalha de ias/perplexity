@@ -1,0 +1,160 @@
+import bcrypt
+import sqlite3
+import re
+from typing import Optional, Tuple
+from datetime import datetime
+
+class SistemaLogin:
+    """Sistema de login seguro com hash de senha e validação"""
+    
+    def __init__(self, db_name: str = "login.db"):
+        self.db_name = db_name
+        self._inicializar_db()
+    
+    def _inicializar_db(self):
+        """Criar tabela de usuários se não existir"""
+        conn = sqlite3.connect(self.db_name)
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+        conn.close()
+    
+    def validar_username(self, username: str) -> Tuple[bool, str]:
+        """Validar formato do username"""
+        if not username or len(username) < 3 or len(username) > 20:
+            return False, "Username deve ter 3-20 caracteres"
+        if not re.match(r'^[a-zA-Z0-9_]+$', username):
+            return False, "Username só pode conter letras, números e _"
+        return True, ""
+    
+    def validar_password(self, password: str) -> Tuple[bool, str]:
+        """Validar força da senha"""
+        if not password or len(password) < 8:
+            return False, "Senha deve ter至少 8 caracteres"
+        if len(password) > 100:
+            return False, "Senha muito longa (max 100 caracteres)"
+        if not re.search(r'[a-zA-Z]', password):
+            return False, "Senha precisa ter至少 uma letra"
+        if not re.search(r'[0-9]', password):
+            return False, "Senha precisa ter至少 um número"
+        return True, ""
+    
+    def registrar_usuario(self, username: str, password: str) -> Tuple[bool, str]:
+        """Registrar novo usuário com hash de senha"""
+        # Validar username
+        valido, msg = self.validar_username(username)
+        if not valido:
+            return False, msg
+        
+        # Validar password
+        valido, msg = self.validar_password(password)
+        if not valido:
+            return False, msg
+        
+        # Criar hash da senha
+        password_bytes = password.encode('utf-8')
+        password_hash = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        
+        # Salvar no database
+        try:
+            conn = sqlite3.connect(self.db_name)
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO usuarios (username, password_hash) VALUES (?, ?)",
+                (username, password_hash)
+            )
+            conn.commit()
+            conn.close()
+            return True, f"Usuário '{username}' registrado com sucesso!"
+        except sqlite3.IntegrityError:
+            return False, "Username já existe. Escolha outro."
+    
+    def login(self, username: str, password: str) -> Tuple[bool, str]:
+        """Fazer login verificando hash da senha"""
+        if not username or not password:
+            return False, "Username e senha são obrigatórios"
+        
+        # Buscar usuário no database
+        conn = sqlite3.connect(self.db_name)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT password_hash FROM usuarios WHERE username = ?",
+            (username,)
+        )
+        resultado = cursor.fetchone()
+        conn.close()
+        
+        if not resultado:
+            return False, "Usuário não encontrado"
+        
+        password_hash = resultado[0]
+        
+        # Verificar hash da senha
+        password_bytes = password.encode('utf-8')
+        if bcrypt.checkpw(password_bytes, password_hash):
+            return True, f"Login realizado com sucesso! Bem-vindo, {username}."
+        else:
+            return False, "Senha incorreta"
+    
+    def mostrar_usuarios(self):
+        """Mostrar todos usuários (apenas para debug)"""
+        conn = sqlite3.connect(self.db_name)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, username, criado_em FROM usuarios")
+        usuarios = cursor.fetchall()
+        conn.close()
+        
+        print("\n=== Usuários Registrados ===")
+        for user in usuarios:
+            print(f"ID: {user[0]}, Username: {user[1]}, Criado: {user[2]}")
+        print()
+
+
+def main():
+    """Função principal com interface interativa"""
+    sistema = SistemaLogin()
+    
+    print("=" * 50)
+    print("🔐 SISTEMA DE LOGIN SEGURO 🔐")
+    print("=" * 50)
+    
+    while True:
+        print("\n1. Registrar novo usuário")
+        print("2. Fazer login")
+        print("3. Mostrar usuários (debug)")
+        print("4. Sair")
+        
+        opcao = input("\nEscolha uma opção: ").strip()
+        
+        if opcao == "1":
+            username = input("Username: ").strip()
+            password = input("Senha: ").strip()
+            sucesso, msg = sistema.registrar_usuario(username, password)
+            print(f"\n{'✅' if sucesso else '❌'} {msg}")
+        
+        elif opcao == "2":
+            username = input("Username: ").strip()
+            password = input("Senha: ").strip()
+            sucesso, msg = sistema.login(username, password)
+            print(f"\n{'✅' if sucesso else '❌'} {msg}")
+        
+        elif opcao == "3":
+            sistema.mostrar_usuarios()
+        
+        elif opcao == "4":
+            print("\n👋 Até mais! Sistema fechado.")
+            break
+        
+        else:
+            print("\n❌ Opção inválida! Escolha 1-4.")
+
+
+if __name__ == "__main__":
+    main()

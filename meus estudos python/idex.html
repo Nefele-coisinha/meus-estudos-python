@@ -1,15 +1,170 @@
-<!DOCKTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <title>MEU PRIMEIRO SITE</title>
+<meta charset="UTF-8">
+<title>❤️</title>
+<style>
+    body {
+        margin: 0;
+        background: rgb(15,15,25);
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+    }
+    canvas {
+        display: block;
+    }
+</style>
 </head>
 <body>
-    <h1>MEU PRIMEIRO SITE</h1>
-    <p>Olá, este é o meu primeiro site!</p>
+<canvas id="c"></canvas>
 
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let tempo = 0;
+let particulas = [];
+let tempoSpawn = 0;
+
+const TEXTO = "I love you";
+const NOME = "AGATA";
+
+const mensagens = [
+"eu penso em você",
+"você é especial",
+"te amo",
+"A melhor coisa foi te conhecer",
+"você é a melhor pessoa da minha vida",
+"você me faz sorrir",
+"nunca quero te perder",
+"quero passar cada dia com você",
+"seu sorriso é meu favorito",
+"sua personalidade é incrível"
+];
+
+let finalAtivo = false;
+let finalAlpha = 0;
+const TEMPO_FINAL = 18;
+
+function heartPoints(scale){
+    let pts = [];
+    for(let t=0;t<360;t+=4){
+        let rad = t * Math.PI/180;
+
+        let x = 16 * Math.pow(Math.sin(rad),3);
+        let y = -(13*Math.cos(rad)
+            -5*Math.cos(2*rad)
+            -2*Math.cos(3*rad)
+            -Math.cos(4*rad));
+
+        pts.push({
+            x: canvas.width/2 + x*scale,
+            y: canvas.height/2 + y*scale
+        });
+    }
+    return pts;
+}
+
+function spawn(){
+    particulas.push({
+        texto: mensagens[Math.floor(Math.random()*mensagens.length)],
+        x: Math.random()<0.5 ? Math.random()*150 : canvas.width-150+Math.random()*130,
+        y: 80 + Math.random()*(canvas.height-160),
+        alpha: 0,
+        fase: "in",
+        tempo: 0
+    });
+}
+
+function draw(time){
+    requestAnimationFrame(draw);
+
+    ctx.fillStyle = "rgb(15,15,25)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    let dt = 1/60;
+    tempo += dt*0.8;
+
+    if(time/1000 >= TEMPO_FINAL){
+        finalAtivo = true;
+    }
+
+    tempoSpawn += dt;
+    if(!finalAtivo && tempoSpawn > 0.4 && particulas.length < 4){
+        tempoSpawn = 0;
+        spawn();
+    }
+
+    particulas.forEach((p,i)=>{
+        p.tempo += dt;
+
+        if(p.fase==="in"){
+            p.alpha += 2;
+            if(p.alpha>=180){
+                p.alpha=180;
+                p.fase="hold";
+                p.tempo=0;
+            }
+        } else if(p.fase==="hold"){
+            if(p.tempo>1.2){
+                p.fase="out";
+            }
+        } else {
+            p.alpha -=2;
+            if(p.alpha<=0){
+                particulas.splice(i,1);
+            }
+        }
+
+        ctx.globalAlpha = finalAtivo ? p.alpha/255*0.3 : p.alpha/255;
+        ctx.fillStyle = "#ff789f";
+        ctx.font = "18px Arial";
+        ctx.fillText(p.texto, p.x, p.y);
+    });
+
+    let pts = heartPoints(12);
+
+    pts.forEach((pt,i)=>{
+        let wave = Math.sin(tempo + i*0.15);
+        let alpha = (wave+1)/2;
+
+        if(finalAtivo) alpha *= 0.2;
+
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = "#ff789f";
+        ctx.font = "16px Arial";
+
+        let offset = Math.sin(tempo+i*0.2)*2;
+
+        ctx.fillText(TEXTO, pt.x, pt.y+offset);
+    });
+
+    ctx.globalAlpha = finalAtivo ? 0.2 : 1;
+    ctx.fillStyle = "#ff789f";
+    ctx.font = "28px Arial";
+
+    let offX = Math.sin(tempo*1.2)*2;
+    let offY = Math.cos(tempo)*2;
+
+    ctx.fillText(NOME, canvas.width/2 - 40 + offX, canvas.height/2 + offY);
+
+    if(finalAtivo){
+        finalAlpha += 0.01;
+        if(finalAlpha>1) finalAlpha=1;
+
+        ctx.globalAlpha = finalAlpha;
+        ctx.font = "42px Arial";
+        ctx.fillText("Eu te amo, AGATA ❤️", canvas.width/2 - 140, canvas.height/2);
+    }
+
+    ctx.globalAlpha = 1;
+}
+
+draw(0);
+</script>
 </body>
 </html>
-
-
-    
     

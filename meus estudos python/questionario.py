@@ -12,13 +12,13 @@ pais = input("qual é seu pais? ").lower()
 
 #verificação do pais 
 
-americano = ["estados unidos", "canadá", "alaska", ""]
+americano = ["estados unidos", "canadá", "canada", "alaska"]
 
 latinos = ["brasil", "argentina", "chile", "peru"]
 
-europa = ["frança", "alemanha", "italia", "espanha"]
+europa = ["frança", "alemanha", "italia", "espanha", "portugal"]
 
-asia = ["japão", "china", "coreia", "russia"]
+asia = ["japão", "china", "coreia", "russia", "india"]
 
 if pais in latinos:
     origem = "latino"
